@@ -28,6 +28,9 @@ site/                   Vite + D3 static front end
     tween.js                  pure: easeOutCubic(), tweenValue() (digit-roll counter)
     audio.js                 createAudio() — synthesized WebAudio SFX + mute persistence
     *.test.js                 vitest unit tests for every pure module above
+  e2e/order-flow.spec.js      Playwright Firefox checks for live replay, failure recovery,
+                              responsive bounds, and keyboard tab order
+  playwright.config.js        starts Vite and defines the Firefox browser-test project
 
 docs/                   VISION (why) / DESIGN (visual spec) / BACKLOG (stories) / this file
 ```
@@ -73,10 +76,12 @@ comments if this ever needs to move to a different toolchain.
 - `cargo test` (in `engine/`) — the matching engine's fill algorithm, including the
   zero-slippage/multi-level/depth-exhausted boundaries.
 - `npm test` (in `site/`) — vitest over every pure JS module (`format`, `ladder-model`,
-  `timeline`, `tween`, `audio`'s mute-state logic). DOM/wasm-dependent wiring
-  (`book-view.js`, `main.js`, `engine.js`) is exercised manually per `docs/DESIGN.md`
-  §D3's self-review checklist rather than through browser-automation tests, which
-  aren't part of this project's committed toolchain.
+  `timeline`, `tween`, and the mute/audio-synthesis logic in `audio`).
+- `npm run test:coverage` (in `site/`) — V8 coverage for those core pure modules;
+  CI enforces an 85% line floor.
+- `npm run test:e2e` (in `site/`) — Playwright + Firefox starts the real Vite app and
+  checks the WASM-to-D3 replay, missing-WASM recovery, 390/768/1440px widths, and
+  keyboard focus order.
 
 ## Running locally
 
@@ -86,4 +91,6 @@ npm install
 npm run dev     # predev regenerates the wasm bindings, then starts Vite
 npm run build   # outputs a self-contained, subpath-relative dist/
 npm test        # vitest
+npm run test:coverage
+npm run test:e2e
 ```
