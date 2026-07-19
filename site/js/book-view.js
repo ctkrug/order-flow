@@ -37,7 +37,8 @@ export function createLadderView(container) {
       .attr("class", `ladder-row ${sideClass}`)
       .each(function appendChildren() {
         const row = d3.select(this);
-        row.append("div").attr("class", "depth-bar");
+        row.append("div").attr("class", "depth-remaining");
+        row.append("div").attr("class", "depth-taken");
         row.append("span").attr("class", "price");
         row.append("span").attr("class", "size");
         row.append("span").attr("class", "taken");
@@ -58,8 +59,14 @@ export function createLadderView(container) {
       });
 
     merged
-      .select(".depth-bar")
-      .style("transform", (d) => `scaleX(${Math.max(d.remaining / maxSize, 0)})`);
+      .select(".depth-taken")
+      .style("left", "0%")
+      .style("width", (d) => `${(Math.max(d.taken, 0) / maxSize) * 100}%`);
+
+    merged
+      .select(".depth-remaining")
+      .style("left", (d) => `${(Math.max(d.taken, 0) / maxSize) * 100}%`)
+      .style("width", (d) => `${(Math.max(d.remaining, 0) / maxSize) * 100}%`);
 
     merged.select(".price").text((d) => d.price.toFixed(2));
     merged.select(".size").text((d) => formatSize(d.remaining));
