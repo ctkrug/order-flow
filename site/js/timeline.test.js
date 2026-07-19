@@ -26,6 +26,10 @@ describe("clampTimelineIndex", () => {
   it("truncates a fractional index", () => {
     expect(clampTimelineIndex(2.9, 6)).toBe(2);
   });
+
+  it("uses the last whole index when a stale length is fractional", () => {
+    expect(clampTimelineIndex(99, 2.9)).toBe(1);
+  });
 });
 
 describe("stepTimelineIndex", () => {
