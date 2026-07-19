@@ -5,7 +5,9 @@
   "description": "D3 front end for Order Flow, wired to the WASM matching engine",
   "type": "module",
   "scripts": {
+    "predev": "bash ../engine/build-wasm.sh",
     "dev": "vite",
+    "prebuild": "bash ../engine/build-wasm.sh",
     "build": "vite build",
     "preview": "vite preview"
   },
