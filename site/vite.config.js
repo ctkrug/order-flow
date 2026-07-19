@@ -7,4 +7,14 @@ export default defineConfig({
   build: {
     outDir: "dist",
   },
+  test: {
+    exclude: ["e2e/**", "node_modules/**", "dist/**", "test-results/**"],
+    coverage: {
+      provider: "v8",
+      include: ["js/audio.js", "js/format.js", "js/ladder-model.js", "js/timeline.js", "js/tween.js"],
+      thresholds: {
+        lines: 85,
+      },
+    },
+  },
 });

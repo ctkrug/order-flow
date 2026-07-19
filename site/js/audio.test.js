@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createAudio } from "./audio.js";
 
 function fakeStorage(initial = {}) {
@@ -10,6 +10,62 @@ function fakeStorage(initial = {}) {
     },
   };
 }
+
+class FakeAudioContext {
+  static instances = [];
+
+  constructor() {
+    this.currentTime = 10;
+    this.sampleRate = 8000;
+    this.destination = {};
+    this.oscillators = [];
+    this.buffers = [];
+    FakeAudioContext.instances.push(this);
+  }
+
+  createOscillator() {
+    const oscillator = {
+      frequency: { value: 0 },
+      connect: vi.fn((target) => target),
+      start: vi.fn(),
+      stop: vi.fn(),
+    };
+    this.oscillators.push(oscillator);
+    return oscillator;
+  }
+
+  createGain() {
+    return {
+      gain: {
+        value: 0,
+        setValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn(),
+      },
+      connect: vi.fn((target) => target),
+    };
+  }
+
+  createBuffer(_channels, frames) {
+    const data = new Float32Array(frames);
+    const buffer = { getChannelData: vi.fn(() => data) };
+    this.buffers.push(buffer);
+    return buffer;
+  }
+
+  createBufferSource() {
+    return { connect: vi.fn((target) => target), start: vi.fn(), buffer: null };
+  }
+
+  createBiquadFilter() {
+    return { connect: vi.fn((target) => target), frequency: { value: 0 }, type: "" };
+  }
+}
+
+afterEach(() => {
+  FakeAudioContext.instances = [];
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe("createAudio mute state", () => {
   it("defaults to unmuted with no stored preference", () => {
@@ -62,5 +118,43 @@ describe("createAudio SFX in an environment without WebAudio", () => {
     const audio = createAudio(fakeStorage());
     audio.setMuted(true);
     expect(() => audio.levelTick(3)).not.toThrow();
+  });
+});
+
+describe("createAudio SFX with WebAudio", () => {
+  it("creates and throttles a level tick oscillator", () => {
+    vi.stubGlobal("AudioContext", FakeAudioContext);
+    const audio = createAudio(fakeStorage());
+
+    audio.levelTick(4);
+    audio.levelTick(5);
+
+    expect(FakeAudioContext.instances).toHaveLength(1);
+    expect(FakeAudioContext.instances[0].oscillators).toHaveLength(1);
+    expect(FakeAudioContext.instances[0].oscillators[0].frequency.value).toBe(188);
+    expect(FakeAudioContext.instances[0].oscillators[0].start).toHaveBeenCalledOnce();
+  });
+
+  it("synthesizes noise for counter and scrub feedback", () => {
+    vi.stubGlobal("AudioContext", FakeAudioContext);
+    const audio = createAudio(fakeStorage());
+
+    audio.counterClick();
+    audio.scrubWhoosh();
+
+    expect(FakeAudioContext.instances[0].buffers).toHaveLength(2);
+    expect(FakeAudioContext.instances[0].buffers[0].getChannelData).toHaveBeenCalledOnce();
+  });
+
+  it("plays the delayed second note of the wow chime", () => {
+    vi.useFakeTimers();
+    vi.stubGlobal("AudioContext", FakeAudioContext);
+    const audio = createAudio(fakeStorage());
+
+    audio.wowMoment();
+    vi.advanceTimersByTime(90);
+
+    expect(FakeAudioContext.instances[0].oscillators).toHaveLength(2);
+    expect(FakeAudioContext.instances[0].oscillators[1].frequency.value).toBe(660);
   });
 });
