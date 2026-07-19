@@ -58,6 +58,7 @@ pub fn simulate_market_order(levels: &[PriceLevel], side: Side, order_size: f64)
         0.0
     };
     let mut remaining = requested_size;
+    let mut filled_size = 0.0;
     let mut consumed = Vec::new();
     let mut notional = 0.0;
     let best_price = levels
@@ -82,10 +83,10 @@ pub fn simulate_market_order(levels: &[PriceLevel], side: Side, order_size: f64)
             size_taken: take,
         });
         notional += take * level.price;
+        filled_size += take;
         remaining -= take;
     }
 
-    let filled_size = requested_size - remaining;
     let avg_price = if filled_size > 0.0 {
         notional / filled_size
     } else {
