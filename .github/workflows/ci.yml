@@ -57,4 +57,10 @@ jobs:
       - working-directory: site
         run: npm ci
       - working-directory: site
+        run: npx playwright install --with-deps firefox
+      - working-directory: site
+        run: npm run test
+      - working-directory: site
+        run: npm run test:e2e
+      - working-directory: site
         run: npm run build
