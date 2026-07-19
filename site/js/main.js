@@ -4,10 +4,12 @@ import { crossesWowThreshold } from "./ladder-model.js";
 import { formatSize, formatUsd } from "./format.js";
 import { clampTimelineIndex, formatSnapshotTime } from "./timeline.js";
 import { createAudio } from "./audio.js";
+import { tweenValue } from "./tween.js";
 
 const SCENARIO_KEYS = ["calm", "thin"];
 const WOW_PULSE_MS = 900;
 const PLAY_INTERVAL_MS = 900;
+const COUNTER_TWEEN_MS = 120;
 
 const els = {
   ladder: document.getElementById("ladder"),
@@ -90,7 +92,22 @@ async function main() {
   let snapshotIndex = 0;
   let side = "buy";
   let prevSlippageCost = 0;
+  let displayedSlippageCost = 0;
+  let tweenFrame = null;
   let playTimer = null;
+
+  function animateSlippageTo(target) {
+    if (tweenFrame !== null) cancelAnimationFrame(tweenFrame);
+    const from = displayedSlippageCost;
+    const start = performance.now();
+    function step(now) {
+      const t = (now - start) / COUNTER_TWEEN_MS;
+      displayedSlippageCost = tweenValue(from, target, t);
+      els.statSlippage.textContent = formatUsd(displayedSlippageCost);
+      tweenFrame = t < 1 ? requestAnimationFrame(step) : null;
+    }
+    tweenFrame = requestAnimationFrame(step);
+  }
 
   function snapshots() {
     return scenarios[scenarioKey].snapshots;
@@ -195,7 +212,7 @@ async function main() {
     els.statUnfilled.textContent = fill ? formatSize(fill.unfilled_size) : "—";
 
     const slippageCost = fill?.slippage_cost ?? 0;
-    els.statSlippage.textContent = formatUsd(slippageCost);
+    animateSlippageTo(slippageCost);
     if (slippageCost > 0) audio.counterClick();
 
     if (crossesWowThreshold(prevSlippageCost, slippageCost)) {
