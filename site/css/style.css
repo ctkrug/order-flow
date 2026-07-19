@@ -647,6 +647,44 @@ body {
     padding: var(--space-2);
   }
 
+  .ladder-controls {
+    align-items: stretch;
+    min-width: 0;
+  }
+
+  .layout,
+  .ladder-panel,
+  .ladder,
+  .ladder-side,
+  .timeline-strip,
+  .timeline-slider {
+    min-width: 0;
+  }
+
+  .control-group {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .side-toggle,
+  .side-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .slider-row .slider {
+    min-width: 0;
+  }
+
+  .size-readout {
+    min-width: 7ch;
+  }
+
   .wordmark {
     font-size: 1.15rem;
   }
