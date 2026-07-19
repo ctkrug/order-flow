@@ -52,4 +52,9 @@ describe("formatSize", () => {
   it("respects a custom decimal count", () => {
     expect(formatSize(1.23456789, 2)).toBe("1.23");
   });
+
+  it("falls back to the default precision for an invalid decimal count", () => {
+    expect(formatSize(1.23456789, NaN)).toBe("1.234568");
+    expect(formatSize(1.23456789, 101)).toBe("1.234568");
+  });
 });
