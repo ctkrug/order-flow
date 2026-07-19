@@ -3,8 +3,10 @@
 /** Clamps an index into the valid [0, length-1] range for a snapshot list. */
 export function clampTimelineIndex(index, length) {
   if (!Number.isFinite(length) || length <= 0) return 0;
+  const count = Math.trunc(length);
+  if (count <= 0) return 0;
   const truncated = Math.trunc(Number.isFinite(index) ? index : 0);
-  return Math.min(Math.max(truncated, 0), length - 1);
+  return Math.min(Math.max(truncated, 0), count - 1);
 }
 
 /** Advances the timeline by `delta` steps, clamping at both ends (no wrap). */
