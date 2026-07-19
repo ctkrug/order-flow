@@ -114,9 +114,18 @@ mod tests {
 
     fn sample_asks() -> Vec<PriceLevel> {
         vec![
-            PriceLevel { price: 100.0, size: 2.0 },
-            PriceLevel { price: 101.0, size: 3.0 },
-            PriceLevel { price: 102.0, size: 5.0 },
+            PriceLevel {
+                price: 100.0,
+                size: 2.0,
+            },
+            PriceLevel {
+                price: 101.0,
+                size: 3.0,
+            },
+            PriceLevel {
+                price: 102.0,
+                size: 5.0,
+            },
         ]
     }
 
