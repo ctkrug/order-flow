@@ -503,7 +503,16 @@ body {
   box-shadow: var(--glow);
 }
 
+.slider:hover::-moz-range-thumb,
+.slider:focus-visible::-moz-range-thumb {
+  box-shadow: var(--glow);
+}
+
 .slider:active::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+.slider:active::-moz-range-thumb {
   transform: scale(1.1);
 }
 
