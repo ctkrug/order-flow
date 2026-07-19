@@ -55,7 +55,8 @@ async function main() {
   }
 
   const ladderView = createLadderView(els.ladder);
-  const side = "buy";
+  const sideButtons = document.querySelectorAll(".side-btn");
+  let side = "buy";
   const snapshot = scenario.snapshots[0];
   let prevSlippageCost = 0;
 
@@ -67,11 +68,22 @@ async function main() {
     return currentLevels().reduce((sum, l) => sum + l.size, 0);
   }
 
-  function configureSlider() {
+  function configureSlider({ resetValue } = { resetValue: false }) {
     const depth = sideDepth();
+    const prevFraction = Number(els.slider.max) > 0 ? Number(els.slider.value) / Number(els.slider.max) : 0;
     els.slider.max = String(depth * 1.3);
     els.slider.step = String(Math.max(depth / 1000, 1e-9));
-    els.slider.value = "0";
+    els.slider.value = resetValue ? "0" : String(prevFraction * Number(els.slider.max));
+  }
+
+  function setSide(newSide) {
+    if (newSide === side) return;
+    side = newSide;
+    sideButtons.forEach((btn) => {
+      btn.setAttribute("aria-pressed", String(btn.dataset.side === side));
+    });
+    configureSlider();
+    update();
   }
 
   function update() {
@@ -98,8 +110,11 @@ async function main() {
     prevSlippageCost = slippageCost;
   }
 
-  configureSlider();
+  configureSlider({ resetValue: true });
   els.slider.addEventListener("input", update);
+  sideButtons.forEach((btn) => {
+    btn.addEventListener("click", () => setSide(btn.dataset.side));
+  });
   update();
 }
 
