@@ -1,0 +1,16 @@
+/* Placeholder styling — the real visual direction lives in docs/DESIGN.md
+   and is implemented in the BUILD phase. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, sans-serif;
+  background: #0b0e14;
+  color: #e6e9ef;
+}
+
+#app {
+  text-align: center;
+}
