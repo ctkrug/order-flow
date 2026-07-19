@@ -153,4 +153,35 @@ mod tests {
         assert_eq!(result.filled_size, 10.0);
         assert_eq!(result.unfilled_size, 90.0);
     }
+
+    #[test]
+    fn ignores_invalid_price_levels_without_poisoning_the_fill() {
+        let levels = vec![
+            PriceLevel {
+                price: f64::NAN,
+                size: 1.0,
+            },
+            PriceLevel {
+                price: 100.0,
+                size: -1.0,
+            },
+            PriceLevel {
+                price: 101.0,
+                size: f64::INFINITY,
+            },
+            PriceLevel {
+                price: 102.0,
+                size: 2.0,
+            },
+        ];
+
+        let result = simulate_market_order(&levels, Side::Buy, 1.0);
+
+        assert_eq!(result.levels.len(), 1);
+        assert_eq!(result.levels[0].price, 102.0);
+        assert_eq!(result.levels[0].size_taken, 1.0);
+        assert_eq!(result.filled_size, 1.0);
+        assert_eq!(result.avg_price, 102.0);
+        assert!(result.slippage_cost.is_finite());
+    }
 }
