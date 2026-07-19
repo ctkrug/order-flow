@@ -7,6 +7,10 @@
 # wasm-bindgen crate dependency in Cargo.toml (see that file's comment).
 set -euo pipefail
 
+# Prefer the rustup-managed toolchain (has the wasm32 target installed) over
+# any system rustc/cargo that may shadow it earlier on PATH.
+export PATH="$HOME/.cargo/bin:$PATH"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT_DIR="$SCRIPT_DIR/../site/vendor/engine"
 
