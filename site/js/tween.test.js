@@ -21,6 +21,11 @@ describe("easeOutCubic", () => {
   it("clamps t above 1", () => {
     expect(easeOutCubic(2)).toBe(1);
   });
+
+  it("treats a non-finite progress value as the start", () => {
+    expect(easeOutCubic(NaN)).toBe(0);
+    expect(easeOutCubic(Infinity)).toBe(0);
+  });
 });
 
 describe("tweenValue", () => {
@@ -44,5 +49,10 @@ describe("tweenValue", () => {
 
   it("handles from === to", () => {
     expect(tweenValue(5, 5, 0.5)).toBe(5);
+  });
+
+  it("keeps a broken endpoint from leaking NaN into the display", () => {
+    expect(tweenValue(NaN, 10, 0.5)).toBeGreaterThan(0);
+    expect(tweenValue(5, Infinity, 0.5)).toBe(5);
   });
 });
