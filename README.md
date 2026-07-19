@@ -61,6 +61,36 @@ toggle, and synth SFX with a persisted mute toggle. See
 [`docs/VISION.md`](docs/VISION.md) for the design and
 [`docs/BACKLOG.md`](docs/BACKLOG.md) for the story-by-story build plan.
 
+## Run locally
+
+Requirements: a current Rust toolchain with the `wasm32-unknown-unknown` target,
+[`wasm-bindgen-cli` 0.2.126](https://crates.io/crates/wasm-bindgen-cli/0.2.126),
+and Node.js 20 or newer.
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen-cli --version 0.2.126 --locked
+
+cd site
+npm install
+npm run dev
+```
+
+`npm run dev` rebuilds the local WASM bindings before starting Vite. Open the
+printed local URL, choose a scenario, drag **Order size**, then switch buy/sell
+or scrub the timeline to replay another snapshot.
+
+## Test and build
+
+```sh
+cd engine && cargo test
+cd ../site
+npm test                 # unit tests
+npm run test:coverage    # unit tests with the 85% core-logic coverage floor
+npm run test:e2e         # Firefox end-to-end replay and recovery checks
+npm run build            # production static site in dist/
+```
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
