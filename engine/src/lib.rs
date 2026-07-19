@@ -196,4 +196,15 @@ mod tests {
         assert_eq!(result.avg_price, 102.0);
         assert!(result.slippage_cost.is_finite());
     }
+
+    #[test]
+    fn preserves_filled_depth_for_an_absurdly_large_order() {
+        let result = simulate_market_order(&sample_asks(), Side::Buy, f64::MAX);
+
+        assert_eq!(result.filled_size, 10.0);
+        assert_eq!(result.levels.len(), 3);
+        assert!(result.unfilled_size.is_finite());
+        assert!(result.avg_price.is_finite());
+        assert!(result.slippage_cost.is_finite());
+    }
 }
