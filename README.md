@@ -35,26 +35,31 @@ or read raw research code to understand what "market impact" actually looks like
 - Everything runs **entirely client-side** — no backend, no signup, no API keys. Open
   the page and it works.
 
-## Planned features
+## Features
 
-- [ ] Scrub through a timeline of historical order-book snapshots
-- [ ] Drag a slider to size a market buy or sell order
-- [ ] Watch the order consume price levels in real time, level by level
-- [ ] Running "slippage paid" counter (vs. best-price execution)
-- [ ] Depth chart that highlights exactly which levels were consumed
-- [ ] Multiple historical scenarios (calm book vs. thin/volatile book) to compare impact
+- [x] Scrub through a timeline of historical order-book snapshots
+- [x] Drag a slider to size a market buy or sell order
+- [x] Watch the order consume price levels in real time, level by level
+- [x] Running "slippage paid" counter (vs. best-price execution)
+- [x] Depth ladder that highlights exactly which levels were consumed
+- [x] Multiple historical scenarios (calm book vs. thin/volatile book) to compare impact
 
 ## Stack
 
 - **Matching engine:** Rust, compiled to WebAssembly (`wasm-bindgen`)
-- **Rendering:** D3.js (SVG order-book depth + level visualization)
-- **Build:** `wasm-pack` for the WASM crate, static site with no server dependency
+- **Rendering:** D3.js (order-book ladder + level visualization)
+- **Build:** `wasm-bindgen-cli` regenerates the JS bindings (`engine/build-wasm.sh`),
+  vendored into `site/vendor/engine` (gitignored, rebuilt by `npm run dev`/`build`);
+  the site itself builds with Vite into a single static, subpath-relative `dist/`
 - **Hosting:** static, self-contained — deployable to any static host or subpath
 
 ## Status
 
-Early scaffold. See [`docs/VISION.md`](docs/VISION.md) for the design and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+Core functionality is built end-to-end: the wow moment (drag-to-size-an-order with a
+live slippage counter), both bundled scenarios, the scrubbable timeline, buy/sell
+toggle, and synth SFX with a persisted mute toggle. See
+[`docs/VISION.md`](docs/VISION.md) for the design and
+[`docs/BACKLOG.md`](docs/BACKLOG.md) for the story-by-story build plan.
 
 ## License
 
