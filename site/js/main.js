@@ -2,6 +2,12 @@ import { loadEngine } from "./engine.js";
 import { createLadderView } from "./book-view.js";
 import { crossesWowThreshold } from "./ladder-model.js";
 import { formatSize, formatUsd } from "./format.js";
+import { clampTimelineIndex, formatSnapshotTime } from "./timeline.js";
+
+const SCENARIO_KEYS = ["calm", "thin"];
+const WOW_PULSE_MS = 900;
+const CROSSFADE_MS = 140;
+const PLAY_INTERVAL_MS = 900;
 
 const els = {
   ladder: document.getElementById("ladder"),
@@ -15,9 +21,11 @@ const els = {
   errorState: document.getElementById("error-state"),
   layout: document.querySelector(".layout"),
   timelineStrip: document.querySelector(".timeline-strip"),
+  scenarioSelect: document.getElementById("scenario"),
+  timelineSlider: document.getElementById("timeline-slider"),
+  timelineReadout: document.getElementById("timeline-readout"),
+  timelinePlay: document.getElementById("timeline-play"),
 };
-
-const WOW_PULSE_MS = 900;
 
 function toLevels(pairs) {
   return pairs.map(([price, size]) => ({ price, size }));
@@ -45,9 +53,14 @@ function showFatalError() {
 
 async function main() {
   let engine;
-  let scenario;
+  let scenarios;
   try {
-    [engine, scenario] = await Promise.all([loadEngine(), loadScenario("calm")]);
+    const [loadedEngine, ...loadedScenarios] = await Promise.all([
+      loadEngine(),
+      ...SCENARIO_KEYS.map(loadScenario),
+    ]);
+    engine = loadedEngine;
+    scenarios = Object.fromEntries(SCENARIO_KEYS.map((key, i) => [key, loadedScenarios[i]]));
   } catch (err) {
     console.error(err);
     showFatalError();
@@ -56,12 +69,32 @@ async function main() {
 
   const ladderView = createLadderView(els.ladder);
   const sideButtons = document.querySelectorAll(".side-btn");
+
+  els.scenarioSelect.innerHTML = "";
+  for (const key of SCENARIO_KEYS) {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = scenarios[key].label;
+    els.scenarioSelect.appendChild(option);
+  }
+
+  let scenarioKey = SCENARIO_KEYS[0];
+  let snapshotIndex = 0;
   let side = "buy";
-  const snapshot = scenario.snapshots[0];
   let prevSlippageCost = 0;
+  let playTimer = null;
+
+  function snapshots() {
+    return scenarios[scenarioKey].snapshots;
+  }
+
+  function currentSnapshot() {
+    return snapshots()[snapshotIndex];
+  }
 
   function currentLevels() {
-    return side === "buy" ? snapshot.asks : snapshot.bids;
+    const s = currentSnapshot();
+    return side === "buy" ? s.asks : s.bids;
   }
 
   function sideDepth() {
@@ -86,6 +119,57 @@ async function main() {
     update();
   }
 
+  function updateTimelineReadout() {
+    const total = snapshots().length;
+    els.timelineReadout.textContent = `${snapshotIndex + 1}/${total} · ${formatSnapshotTime(currentSnapshot().t)}`;
+  }
+
+  function goToSnapshot(index, { crossfade } = { crossfade: true }) {
+    snapshotIndex = clampTimelineIndex(index, snapshots().length);
+    els.timelineSlider.value = String(snapshotIndex);
+    updateTimelineReadout();
+    if (crossfade) {
+      els.ladder.classList.add("scrub-dim");
+      requestAnimationFrame(() => requestAnimationFrame(() => els.ladder.classList.remove("scrub-dim")));
+    }
+    update();
+  }
+
+  function stopPlayback() {
+    if (playTimer !== null) {
+      clearInterval(playTimer);
+      playTimer = null;
+    }
+    els.timelinePlay.setAttribute("aria-pressed", "false");
+  }
+
+  function togglePlayback() {
+    if (playTimer !== null) {
+      stopPlayback();
+      return;
+    }
+    els.timelinePlay.setAttribute("aria-pressed", "true");
+    playTimer = setInterval(() => {
+      const next = snapshotIndex + 1;
+      if (next >= snapshots().length) {
+        stopPlayback();
+        return;
+      }
+      goToSnapshot(next);
+    }, PLAY_INTERVAL_MS);
+  }
+
+  function setScenario(key) {
+    stopPlayback();
+    scenarioKey = key;
+    els.timelineSlider.max = String(snapshots().length - 1);
+    snapshotIndex = 0;
+    els.timelineSlider.value = "0";
+    updateTimelineReadout();
+    configureSlider({ resetValue: true });
+    update();
+  }
+
   function update() {
     const orderSize = Number(els.slider.value);
     els.sizeReadout.textContent = formatSize(orderSize);
@@ -93,7 +177,7 @@ async function main() {
     const levels = currentLevels();
     const fill = orderSize > 0 ? engine.simulateMarketOrder(levels, side === "buy", orderSize) : null;
 
-    ladderView.render(snapshot, fill, side);
+    ladderView.render(currentSnapshot(), fill, side);
 
     const bestPrice = levels[0]?.price;
     els.statBest.textContent = Number.isFinite(bestPrice) ? formatUsd(bestPrice) : "—";
@@ -110,11 +194,22 @@ async function main() {
     prevSlippageCost = slippageCost;
   }
 
+  els.scenarioSelect.value = scenarioKey;
+  els.timelineSlider.max = String(snapshots().length - 1);
+  updateTimelineReadout();
   configureSlider({ resetValue: true });
+
   els.slider.addEventListener("input", update);
   sideButtons.forEach((btn) => {
     btn.addEventListener("click", () => setSide(btn.dataset.side));
   });
+  els.scenarioSelect.addEventListener("change", (e) => setScenario(e.target.value));
+  els.timelineSlider.addEventListener("input", (e) => {
+    stopPlayback();
+    goToSnapshot(Number(e.target.value));
+  });
+  els.timelinePlay.addEventListener("click", togglePlayback);
+
   update();
 }
 
