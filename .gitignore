@@ -17,6 +17,8 @@ yarn-error.log*
 dist/
 site/dist/
 site/vendor/
+site/test-results/
+site/playwright-report/
 
 # Editor / OS
 .vscode/
