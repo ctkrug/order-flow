@@ -19,6 +19,7 @@ site/dist/
 site/vendor/
 site/test-results/
 site/playwright-report/
+site/coverage/
 
 # Editor / OS
 .vscode/
