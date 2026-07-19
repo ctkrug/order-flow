@@ -57,3 +57,27 @@ test("reaches every control in a keyboard-only pass", async ({ page }) => {
     await expect(page.locator(selector)).toBeFocused();
   }
 });
+
+test("stays stable through rapid replay updates", async ({ page }) => {
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error));
+  await page.goto("/");
+  await expect(page.locator(".ladder-row")).not.toHaveCount(0);
+
+  const orderSize = page.locator("#size-slider");
+  await orderSize.evaluate((input) => {
+    for (let step = 1; step <= 30; step += 1) {
+      input.value = String((Number(input.max) * step) / 30);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+
+  for (let cycle = 0; cycle < 10; cycle += 1) {
+    await page.locator("#timeline-play").click();
+    await page.locator("#timeline-play").click();
+  }
+
+  await expect(page.locator("#timeline-play")).toHaveAttribute("aria-pressed", "false");
+  expect(await page.locator(".ladder-row").count()).toBeGreaterThan(0);
+  expect(pageErrors).toEqual([]);
+});
