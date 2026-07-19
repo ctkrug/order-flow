@@ -42,15 +42,19 @@ jobs:
   site:
     name: Site (build)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: site
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: install wasm-bindgen-cli matching the engine's pinned version
+        run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: site/package-lock.json
-      - run: npm ci
-      - run: npm run build
+      - working-directory: site
+        run: npm ci
+      - working-directory: site
+        run: npm run build
