@@ -23,6 +23,9 @@ export function formatUsd(value) {
  */
 export function formatSize(value, maxDecimals = 6) {
   if (!Number.isFinite(value)) return "0";
+  const decimals = Number.isInteger(maxDecimals) && maxDecimals >= 0 && maxDecimals <= 100
+    ? maxDecimals
+    : 6;
   const clamped = Math.max(value, 0);
-  return Number(clamped.toFixed(maxDecimals)).toString();
+  return Number(clamped.toFixed(decimals)).toString();
 }
