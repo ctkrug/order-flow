@@ -43,6 +43,17 @@ describe("buildLadderRows", () => {
     const rows = buildLadderRows(asks, undefined);
     expect(rows.every((r) => !r.consumed)).toBe(true);
   });
+
+  it("ignores malformed consumed levels instead of producing NaN widths", () => {
+    const rows = buildLadderRows(asks, [
+      { price: 100, size_taken: NaN },
+      { price: 101, size_taken: -2 },
+      { price: 102, size_taken: 1 },
+    ]);
+    expect(rows[0].taken).toBe(0);
+    expect(rows[1].taken).toBe(0);
+    expect(rows[2].taken).toBe(1);
+  });
 });
 
 describe("crossesWowThreshold", () => {
