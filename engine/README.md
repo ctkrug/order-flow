@@ -11,9 +11,14 @@ directly from JS after compiling to `wasm32-unknown-unknown`.
 # native tests
 cargo test
 
-# wasm target (what the site consumes)
-cargo build --release --target wasm32-unknown-unknown
+# wasm target + regenerate the JS bindings the site imports
+./build-wasm.sh
 ```
+
+`build-wasm.sh` builds the `wasm32-unknown-unknown` target and runs
+`wasm-bindgen` (must match the crate's pinned version in `Cargo.toml`
+exactly) into `../site/vendor/engine`, gitignored and regenerated
+automatically by the site's `npm run dev`/`build`.
 
 See [`../docs/VISION.md`](../docs/VISION.md) for why the engine exists and
 [`src/lib.rs`](src/lib.rs) for the fill algorithm and its unit tests.
