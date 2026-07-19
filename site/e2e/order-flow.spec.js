@@ -30,3 +30,30 @@ test("shows a recoverable error when the matching engine asset is unavailable", 
   await expect(page.locator(".layout")).toBeHidden();
   await expect(page.locator(".timeline-strip")).toBeHidden();
 });
+
+test("keeps the interactive surface within each supported viewport", async ({ page }) => {
+  for (const [width, height] of [[390, 844], [768, 900], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    await expect(page.locator(".ladder-row")).not.toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  }
+});
+
+test("reaches every control in a keyboard-only pass", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".ladder-row")).not.toHaveCount(0);
+
+  for (const selector of [
+    "#mute-toggle",
+    "#scenario",
+    '[data-side="buy"]',
+    '[data-side="sell"]',
+    "#size-slider",
+    "#timeline-play",
+    "#timeline-slider",
+  ]) {
+    await page.keyboard.press("Tab");
+    await expect(page.locator(selector)).toBeFocused();
+  }
+});
