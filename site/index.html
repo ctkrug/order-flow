@@ -8,13 +8,95 @@
       name="description"
       content="Scrub through real historical order-book snapshots and watch a market order eat through price levels in real time."
     />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
+    <div class="scanline" aria-hidden="true"></div>
+    <div class="grid-bg" aria-hidden="true"></div>
+
     <div id="app">
-      <h1>Order Flow</h1>
-      <p id="status">loading engine…</p>
+      <header class="header">
+        <h1 class="wordmark">ORDER FLOW<span class="cursor" aria-hidden="true"></span></h1>
+        <button id="mute-toggle" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound effects">
+          <span class="icon-sound" aria-hidden="true"></span>
+        </button>
+      </header>
+
+      <p class="intro">
+        Slippage is easy to describe and hard to <em>see</em>. This replays real
+        historical order-book snapshots — drag the size slider and watch a
+        market order physically eat through price levels, with a running cost
+        counter, computed by an actual Rust matching engine running in your
+        browser.
+      </p>
+
+      <main class="layout">
+        <section class="ladder-panel panel" aria-label="Order book">
+          <div class="ladder-controls">
+            <div class="control-group">
+              <label for="scenario">Scenario</label>
+              <select id="scenario" class="select"></select>
+            </div>
+            <div class="side-toggle" role="group" aria-label="Order side">
+              <button type="button" class="side-btn" data-side="buy" aria-pressed="true">
+                BUY <span class="side-hint">(eats asks)</span>
+              </button>
+              <button type="button" class="side-btn" data-side="sell" aria-pressed="false">
+                SELL <span class="side-hint">(eats bids)</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="ladder" class="ladder" aria-live="polite" aria-atomic="true"></div>
+
+          <div class="slider-row">
+            <label for="size-slider">Order size</label>
+            <input type="range" id="size-slider" class="slider" min="0" max="1" step="0.0001" value="0" />
+            <output id="size-readout" for="size-slider" class="size-readout">0</output>
+          </div>
+        </section>
+
+        <aside class="hud panel" aria-label="Fill statistics">
+          <div class="hud-stat">
+            <span class="hud-label">Best price</span>
+            <span id="stat-best" class="hud-value">—</span>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">Avg fill price</span>
+            <span id="stat-avg" class="hud-value">—</span>
+          </div>
+          <div class="hud-stat hud-callout" id="slippage-callout">
+            <span class="hud-label">You just paid in slippage</span>
+            <span id="stat-slippage" class="hud-value hud-value-big">$0.00</span>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">Unfilled size</span>
+            <span id="stat-unfilled" class="hud-value">—</span>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="timeline-strip" aria-label="Snapshot timeline">
+        <button id="timeline-play" class="icon-btn" type="button" aria-label="Play timeline" aria-pressed="false">
+          <span class="icon-play" aria-hidden="true"></span>
+        </button>
+        <input type="range" id="timeline-slider" class="slider timeline-slider" min="0" max="0" step="1" value="0" />
+        <span id="timeline-readout" class="timeline-readout">—</span>
+      </footer>
+
+      <div id="error-state" class="error-state" role="alert" hidden>
+        <p><strong>The matching engine failed to load.</strong> Reload the page — if this
+        keeps happening, your browser may not support WebAssembly.</p>
+      </div>
     </div>
+
     <script type="module" src="./js/main.js"></script>
   </body>
 </html>
