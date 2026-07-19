@@ -10,19 +10,23 @@
  */
 export function buildLadderRows(levels, consumedLevels) {
   const takenByPrice = new Map();
-  for (const c of consumedLevels ?? []) {
+  for (const c of Array.isArray(consumedLevels) ? consumedLevels : []) {
+    if (!Number.isFinite(c?.price) || !Number.isFinite(c?.size_taken) || c.size_taken <= 0) {
+      continue;
+    }
     takenByPrice.set(c.price, (takenByPrice.get(c.price) ?? 0) + c.size_taken);
   }
 
-  return (levels ?? []).map((level) => {
-    const taken = Math.min(takenByPrice.get(level.price) ?? 0, level.size);
+  return (Array.isArray(levels) ? levels : []).map((level) => {
+    const size = Number.isFinite(level?.size) && level.size > 0 ? level.size : 0;
+    const taken = Math.min(takenByPrice.get(level?.price) ?? 0, size);
     return {
-      price: level.price,
-      size: level.size,
+      price: level?.price,
+      size,
       taken,
-      remaining: Math.max(level.size - taken, 0),
+      remaining: Math.max(size - taken, 0),
       consumed: taken > 0,
-      fullyConsumed: taken >= level.size && level.size > 0,
+      fullyConsumed: taken >= size && size > 0,
     };
   });
 }
