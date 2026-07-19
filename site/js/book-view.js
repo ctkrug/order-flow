@@ -20,7 +20,7 @@ export function createLadderView(container) {
   let prevConsumedAsks = new Set();
   let prevConsumedBids = new Set();
 
-  function renderSide(sideEl, levels, consumedLevels, sideClass, prevConsumed) {
+  function renderSide(sideEl, levels, consumedLevels, sideClass, prevConsumed, onNewlyConsumed) {
     const rows = buildLadderRows(levels, consumedLevels);
     const maxSize = d3.max(rows, (r) => r.size) || 1;
     const nowConsumed = new Set(rows.filter((r) => r.consumed).map((r) => r.price));
@@ -55,6 +55,7 @@ export function createLadderView(container) {
         row.classed("flash", isNewlyConsumed);
         if (isNewlyConsumed) {
           setTimeout(() => row.classed("flash", false), FLASH_MS);
+          onNewlyConsumed?.();
         }
       });
 
@@ -81,13 +82,15 @@ export function createLadderView(container) {
      * @param {object|null} fillResult from engine.simulateMarketOrder, or null before any order is sized
      * @param {"buy"|"sell"} side
      */
-    render(book, fillResult, side) {
+    render(book, fillResult, side, { onLevelConsumed } = {}) {
       const consumedLevels = fillResult?.levels ?? [];
       const askConsumed = side === "buy" ? consumedLevels : [];
       const bidConsumed = side === "sell" ? consumedLevels : [];
+      let newlyConsumedCount = 0;
+      const bumpTick = () => onLevelConsumed?.(newlyConsumedCount++);
 
-      prevConsumedAsks = renderSide(asksEl, book.asks, askConsumed, "asks", prevConsumedAsks);
-      prevConsumedBids = renderSide(bidsEl, book.bids, bidConsumed, "bids", prevConsumedBids);
+      prevConsumedAsks = renderSide(asksEl, book.asks, askConsumed, "asks", prevConsumedAsks, bumpTick);
+      prevConsumedBids = renderSide(bidsEl, book.bids, bidConsumed, "bids", prevConsumedBids, bumpTick);
 
       const bestBid = book.bids[0]?.price;
       const bestAsk = book.asks[0]?.price;

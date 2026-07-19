@@ -3,10 +3,10 @@ import { createLadderView } from "./book-view.js";
 import { crossesWowThreshold } from "./ladder-model.js";
 import { formatSize, formatUsd } from "./format.js";
 import { clampTimelineIndex, formatSnapshotTime } from "./timeline.js";
+import { createAudio } from "./audio.js";
 
 const SCENARIO_KEYS = ["calm", "thin"];
 const WOW_PULSE_MS = 900;
-const CROSSFADE_MS = 140;
 const PLAY_INTERVAL_MS = 900;
 
 const els = {
@@ -25,6 +25,7 @@ const els = {
   timelineSlider: document.getElementById("timeline-slider"),
   timelineReadout: document.getElementById("timeline-readout"),
   timelinePlay: document.getElementById("timeline-play"),
+  muteToggle: document.getElementById("mute-toggle"),
 };
 
 function toLevels(pairs) {
@@ -68,7 +69,14 @@ async function main() {
   }
 
   const ladderView = createLadderView(els.ladder);
+  const audio = createAudio();
   const sideButtons = document.querySelectorAll(".side-btn");
+
+  els.muteToggle.setAttribute("aria-pressed", String(audio.isMuted()));
+  els.muteToggle.addEventListener("click", () => {
+    audio.setMuted(!audio.isMuted());
+    els.muteToggle.setAttribute("aria-pressed", String(audio.isMuted()));
+  });
 
   els.scenarioSelect.innerHTML = "";
   for (const key of SCENARIO_KEYS) {
@@ -177,7 +185,9 @@ async function main() {
     const levels = currentLevels();
     const fill = orderSize > 0 ? engine.simulateMarketOrder(levels, side === "buy", orderSize) : null;
 
-    ladderView.render(currentSnapshot(), fill, side);
+    ladderView.render(currentSnapshot(), fill, side, {
+      onLevelConsumed: (index) => audio.levelTick(index),
+    });
 
     const bestPrice = levels[0]?.price;
     els.statBest.textContent = Number.isFinite(bestPrice) ? formatUsd(bestPrice) : "—";
@@ -186,10 +196,12 @@ async function main() {
 
     const slippageCost = fill?.slippage_cost ?? 0;
     els.statSlippage.textContent = formatUsd(slippageCost);
+    if (slippageCost > 0) audio.counterClick();
 
     if (crossesWowThreshold(prevSlippageCost, slippageCost)) {
       els.slippageCallout.classList.add("wow-pulse");
       setTimeout(() => els.slippageCallout.classList.remove("wow-pulse"), WOW_PULSE_MS);
+      audio.wowMoment();
     }
     prevSlippageCost = slippageCost;
   }
@@ -208,6 +220,7 @@ async function main() {
     stopPlayback();
     goToSnapshot(Number(e.target.value));
   });
+  els.timelineSlider.addEventListener("change", () => audio.scrubWhoosh());
   els.timelinePlay.addEventListener("click", togglePlayback);
 
   update();
