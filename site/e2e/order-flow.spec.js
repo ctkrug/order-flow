@@ -21,3 +21,12 @@ test("replays a market order through the WASM-powered order book", async ({ page
   await page.locator("#scenario").selectOption("thin");
   await expect(page.locator("#timeline-readout")).toContainText("1/");
 });
+
+test("shows a recoverable error when the matching engine asset is unavailable", async ({ page }) => {
+  await page.route("**/*.wasm", (route) => route.abort());
+  await page.goto("/");
+
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.locator(".layout")).toBeHidden();
+  await expect(page.locator(".timeline-strip")).toBeHidden();
+});
