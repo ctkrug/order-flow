@@ -52,14 +52,26 @@ pub struct FillResult {
 /// `levels` must be sorted best-to-worst for the side being consumed (asks
 /// ascending for a buy, bids descending for a sell).
 pub fn simulate_market_order(levels: &[PriceLevel], side: Side, order_size: f64) -> FillResult {
-    let mut remaining = order_size;
+    let requested_size = if order_size.is_finite() && order_size > 0.0 {
+        order_size
+    } else {
+        0.0
+    };
+    let mut remaining = requested_size;
     let mut consumed = Vec::new();
     let mut notional = 0.0;
-    let best_price = levels.first().map(|l| l.price).unwrap_or(0.0);
+    let best_price = levels
+        .iter()
+        .find(|level| level.price.is_finite() && level.size.is_finite() && level.size > 0.0)
+        .map(|level| level.price)
+        .unwrap_or(0.0);
 
     for level in levels {
         if remaining <= 0.0 {
             break;
+        }
+        if !level.price.is_finite() || !level.size.is_finite() || level.size <= 0.0 {
+            continue;
         }
         let take = remaining.min(level.size);
         if take <= 0.0 {
@@ -73,7 +85,7 @@ pub fn simulate_market_order(levels: &[PriceLevel], side: Side, order_size: f64)
         remaining -= take;
     }
 
-    let filled_size = order_size - remaining;
+    let filled_size = requested_size - remaining;
     let avg_price = if filled_size > 0.0 {
         notional / filled_size
     } else {
