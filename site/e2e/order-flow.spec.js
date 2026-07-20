@@ -105,3 +105,18 @@ test("rescales order size when replay depth changes", async ({ page }) => {
   expect(resized.max).not.toBe(initialMax);
   expect(resized.value / resized.max).toBeCloseTo(0.5, 2);
 });
+
+test("recovers from a corrupt mute preference across reloads", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("order-flow-muted", "{not-valid"));
+  await page.reload();
+
+  const mute = page.locator("#mute-toggle");
+  await expect(mute).toHaveAttribute("aria-pressed", "false");
+  await mute.click();
+  await expect(mute).toHaveAttribute("aria-pressed", "true");
+
+  await page.reload();
+  await expect(mute).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("alert")).toBeHidden();
+});
