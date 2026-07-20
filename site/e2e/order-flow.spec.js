@@ -51,6 +51,7 @@ test("reaches every control in a keyboard-only pass", async ({ page }) => {
     "#scenario",
     '[data-side="buy"]',
     '[data-side="sell"]',
+    "#ladder",
     "#size-slider",
     "#timeline-play",
     "#timeline-slider",

@@ -482,6 +482,12 @@ body {
   opacity: 0.55;
 }
 
+.ladder:focus-visible {
+  outline: 1px solid var(--accent-buy);
+  outline-offset: 4px;
+  box-shadow: var(--glow);
+}
+
 .ladder-side {
   display: flex;
   flex-direction: column;
