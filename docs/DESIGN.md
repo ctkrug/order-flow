@@ -2,12 +2,12 @@
 
 ## 1. Aesthetic direction
 
-**Order Flow is blueprint/technical**: the page reads like an annotated engineering
-schematic of the order book — deep blueprint-navy ground, cyan linework, precise tick
+**Depthwalk is blueprint/technical**: the page reads like an annotated engineering
+schematic of the order book, with a deep blueprint-navy ground, cyan linework, precise tick
 marks, monospace data readouts, and a faint sweeping scan-line that ties back to "watch
 the mechanics happen." It's built to make the *mechanism* legible, the way a schematic
 makes a circuit legible, rather than dressing the data up as a generic fintech dashboard.
-This is deliberately not "dark gray cards + one blue accent" — the blueprint grid, the
+This is deliberately not "dark gray cards + one blue accent." The blueprint grid, the
 schematic callouts, and the monospace data voice are the personality, not just a color
 choice.
 
@@ -27,16 +27,16 @@ choice.
 | `--danger` | `#ff6b6b` | shared with accent-sell |
 | `--line` | `#2a4460` | blueprint grid lines, dashed guides |
 
-**Type pairing:** display/wordmark — **Space Grotesk** (Google Fonts), a geometric
-sans with a technical edge, for the wordmark and headings. Data/UI — **JetBrains Mono**
-(Google Fonts) for every number, price, label, and control — order-book prices and the
+**Type pairing:** display/wordmark: **Space Grotesk** (Google Fonts), a geometric
+sans with a technical edge, for the wordmark and headings. Data/UI: **JetBrains Mono**
+(Google Fonts) for every number, price, label, and control. Order-book prices and the
 slippage counter must feel like real instrument readouts, monospaced so digits don't
 jitter the layout as they change. System fallback stack for both: `ui-sans-serif,
 system-ui` / `ui-monospace, "SF Mono", monospace`.
 
 **Spacing:** 8px base unit (8/16/24/32/48/64).
 
-**Corner radius:** 2px on panels and controls — sharp, drafting-table precision, not
+**Corner radius:** 2px on panels and controls: sharp, drafting-table precision, not
 soft app-UI rounding. Buttons and the slider thumb get 3px.
 
 **Shadow / glow:** no drop shadows; depth comes from a 1px `--line` border plus a soft
@@ -48,7 +48,7 @@ happening as the slider moves) is snappier: 90ms ease-out flash per level.
 
 ## 3. Layout intent
 
-**The hero is the order-book ladder + the size slider directly beneath it** — together
+**The hero is the order-book ladder + the size slider directly beneath it.** Together
 they own ~65% of the viewport on desktop. Above them, a slim header with the wordmark
 and mute toggle. To the side (desktop) / below (phone), a HUD-style stats readout: best
 price, average fill price, and the big **slippage-cost counter** in `--accent-slippage`,
@@ -67,8 +67,8 @@ styled like a schematic callout box with a leader line to the ladder.
 
 A faint **blueprint grid** (1px `--line` lines, 24px pitch) sits behind everything, and
 a slow **scan-line sweep** (a soft cyan gradient band, ~4s loop, opacity ~0.05) drifts
-top-to-bottom across the whole page — subtle atmosphere, never distracting, and it pauses
-under `prefers-reduced-motion`. The wordmark "ORDER FLOW" ends with a blinking
+top-to-bottom across the whole page. It stays subtle and pauses under
+`prefers-reduced-motion`. The wordmark "DEPTHWALK" ends with a blinking
 monospace cursor block (like a ticker prompt), animated with a CSS step function.
 
 ## 5. The juice plan
@@ -89,12 +89,12 @@ This is a toy, not a game, but every interaction still needs to feel alive:
   rather than hard-cutting, so replay feels continuous.
 
 **Synth SFX (WebAudio, oscillator/noise-generated, no audio files):**
-- `level-tick` — short square-wave blip, pitch stepping down slightly per level
+- `level-tick`: short square-wave blip, pitch stepping down slightly per level
   consumed, ~30ms, low volume (fires per level as the slider crosses it).
-- `counter-click` — a very short (~15ms) filtered noise tick under the rolling
+- `counter-click`: a very short (~15ms) filtered noise tick under the rolling
   slippage counter, rate-throttled so rapid drags don't machine-gun.
-- `wow-moment` — a brief rising two-note chime the first time slippage goes nonzero.
-- `scrub-whoosh` — a soft, short filtered-noise sweep on timeline scrub release.
+- `wow-moment`: a brief rising two-note chime the first time slippage goes nonzero.
+- `scrub-whoosh`: a soft, short filtered-noise sweep on timeline scrub release.
 
 All sounds are subtle and rate-throttled. A mute toggle (top-right, icon button) lives
 in the header, persists to `localStorage`, and the `AudioContext` is created lazily on
