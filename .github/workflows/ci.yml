@@ -14,7 +14,7 @@ jobs:
       run:
         working-directory: engine
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -32,7 +32,7 @@ jobs:
       run:
         working-directory: engine
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -43,13 +43,13 @@ jobs:
     name: Site (build)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
       - name: install wasm-bindgen-cli matching the engine's pinned version
         run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
           cache: npm
