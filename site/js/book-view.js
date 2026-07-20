@@ -97,7 +97,7 @@ export function createLadderView(container) {
       midEl.text(
         Number.isFinite(bestBid) && Number.isFinite(bestAsk)
           ? `spread ${(bestAsk - bestBid).toFixed(2)}`
-          : "—",
+          : "Spread unavailable",
       );
     },
   };

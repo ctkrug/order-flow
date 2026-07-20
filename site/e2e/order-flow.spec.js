@@ -5,7 +5,7 @@ test("replays a market order through the WASM-powered order book", async ({ page
 
   await expect(page.getByRole("alert")).toBeHidden();
   expect(await page.locator(".ladder-row").count()).toBeGreaterThan(0);
-  await expect(page.locator("#stat-best")).not.toHaveText("—");
+  await expect(page.locator("#stat-best")).not.toHaveText("Not set");
 
   const orderSize = page.locator("#size-slider");
   await orderSize.evaluate((input) => {
@@ -45,6 +45,8 @@ test("reaches every control in a keyboard-only pass", async ({ page }) => {
   await expect(page.locator(".ladder-row")).not.toHaveCount(0);
 
   for (const selector of [
+    ".wordmark",
+    ".github-link",
     "#mute-toggle",
     "#scenario",
     '[data-side="buy"]',

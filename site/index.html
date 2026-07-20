@@ -3,11 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Order Flow — watch slippage happen</title>
+    <title>Depthwalk | Watch market orders turn depth into slippage</title>
     <meta
       name="description"
-      content="Scrub through real historical order-book snapshots and watch a market order eat through price levels in real time."
+      content="Replay market orders against historical order-book depth and watch every fill, average-price change, and dollar of slippage form."
     />
+    <meta property="og:title" content="Depthwalk | Watch market orders turn depth into slippage" />
+    <meta
+      property="og:description"
+      content="Replay market orders against historical order-book depth and see exactly where slippage comes from."
+    />
+    <meta name="theme-color" content="#0d1b2a" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,22 +29,32 @@
 
     <div id="app">
       <header class="header">
-        <h1 class="wordmark">ORDER FLOW<span class="cursor" aria-hidden="true"></span></h1>
-        <button id="mute-toggle" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound effects">
-          <span class="icon-sound" aria-hidden="true"></span>
-        </button>
+        <a class="wordmark" href="./" aria-label="Depthwalk home">
+          DEPTHWALK<span class="cursor" aria-hidden="true"></span>
+        </a>
+        <nav class="header-actions" aria-label="Project links and sound">
+          <a class="github-link" href="https://github.com/ctkrug/order-flow">View on GitHub</a>
+          <button id="mute-toggle" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound effects">
+            <svg class="sound-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path class="speaker" d="M4 9v6h4l5 4V5L8 9H4Z" />
+              <path class="sound-waves" d="M16 9c1.3 1.4 1.3 4.6 0 6M18.7 6.7c3 3 3 7.6 0 10.6" />
+              <path class="sound-off" d="m16 9 5 6m0-6-5 6" />
+            </svg>
+          </button>
+        </nav>
       </header>
 
-      <p class="intro">
-        Slippage is easy to describe and hard to <em>see</em>. This replays real
-        historical order-book snapshots — drag the size slider and watch a
-        market order physically eat through price levels, with a running cost
-        counter, computed by an actual Rust matching engine running in your
-        browser.
-      </p>
+      <section class="hero-copy" aria-labelledby="hero-title">
+        <p class="eyebrow">Historical depth / live simulation</p>
+        <h1 id="hero-title">See where slippage comes from.</h1>
+        <p class="intro">
+          For finance and computer-science students: drag a market order through
+          real Coinbase snapshots and connect each consumed level to its final fill.
+        </p>
+      </section>
 
       <main class="layout">
-        <section class="ladder-panel panel" aria-label="Order book">
+        <section class="ladder-panel panel" aria-label="Order book simulator">
           <div class="ladder-controls">
             <div class="control-group">
               <label for="scenario">Scenario</label>
@@ -66,11 +82,11 @@
         <aside class="hud panel" aria-label="Fill statistics">
           <div class="hud-stat">
             <span class="hud-label">Best price</span>
-            <span id="stat-best" class="hud-value">—</span>
+            <span id="stat-best" class="hud-value">Not set</span>
           </div>
           <div class="hud-stat">
             <span class="hud-label">Avg fill price</span>
-            <span id="stat-avg" class="hud-value">—</span>
+            <span id="stat-avg" class="hud-value">Not set</span>
           </div>
           <div class="hud-stat hud-callout" id="slippage-callout">
             <span class="hud-label">You just paid in slippage</span>
@@ -78,23 +94,111 @@
           </div>
           <div class="hud-stat">
             <span class="hud-label">Unfilled size</span>
-            <span id="stat-unfilled" class="hud-value">—</span>
+            <span id="stat-unfilled" class="hud-value">Not set</span>
           </div>
         </aside>
       </main>
 
-      <footer class="timeline-strip" aria-label="Snapshot timeline">
+      <section class="timeline-strip" aria-label="Snapshot timeline">
         <button id="timeline-play" class="icon-btn" type="button" aria-label="Play timeline" aria-pressed="false">
-          <span class="icon-play" aria-hidden="true"></span>
+          <span class="play-icon" aria-hidden="true"></span>
         </button>
-        <input type="range" id="timeline-slider" class="slider timeline-slider" min="0" max="0" step="1" value="0" />
-        <span id="timeline-readout" class="timeline-readout">—</span>
-      </footer>
+        <input type="range" id="timeline-slider" class="slider timeline-slider" min="0" max="0" step="1" value="0" aria-label="Snapshot" />
+        <span id="timeline-readout" class="timeline-readout">Loading snapshots</span>
+      </section>
 
       <div id="error-state" class="error-state" role="alert" hidden>
-        <p><strong>The matching engine failed to load.</strong> Reload the page — if this
+        <p><strong>The matching engine failed to load.</strong> Reload the page. If this
         keeps happening, your browser may not support WebAssembly.</p>
       </div>
+
+      <section class="field-notes" aria-labelledby="field-notes-title">
+        <div class="section-heading">
+          <p class="eyebrow">Field notes / 01</p>
+          <h2 id="field-notes-title">Read the fill, not just the quote</h2>
+        </div>
+        <div class="notes-copy">
+          <p>
+            A market order accepts the best available resting prices until its
+            requested size is filled or the book runs out. The quote at the top
+            of the ladder is only the first stop. Drag the order-size control
+            past that level and the amber fill path shows the prices the order
+            reaches next. The average-price readout is the volume-weighted result
+            of those fills, not a decorative estimate.
+          </p>
+          <p>
+            Switch between the deep BTC-USD book and the thinner AUCTION-USD
+            book to hold the mechanism constant while liquidity changes. The
+            Rust engine applies the same fill algorithm to both snapshot sets in
+            your browser. Nothing is sent to a trading venue, and this is not a
+            forecast or an order-entry screen.
+          </p>
+        </div>
+      </section>
+
+      <section class="schematic-list" aria-label="What the simulator shows">
+        <article>
+          <span class="note-index">A</span>
+          <div>
+            <h3>Follow each consumed level</h3>
+            <p>Remaining depth keeps the side color; filled depth turns amber so the execution path stays visible.</p>
+          </div>
+        </article>
+        <article>
+          <span class="note-index">B</span>
+          <div>
+            <h3>Compare deep and thin books</h3>
+            <p>Six timestamped snapshots per scenario let you replay how the same order size meets different liquidity.</p>
+          </div>
+        </article>
+        <article>
+          <span class="note-index">C</span>
+          <div>
+            <h3>Separate fill price from slippage cost</h3>
+            <p>Best price, average fill, unfilled size, and dollar slippage update together as the order walks the ladder.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="experiment" aria-labelledby="experiment-title">
+        <div class="section-heading">
+          <p class="eyebrow">Lab procedure / 02</p>
+          <h2 id="experiment-title">Run a two-minute liquidity check</h2>
+        </div>
+        <ol>
+          <li>Choose BTC-USD and move the order-size slider until the first amber slippage value appears.</li>
+          <li>Scrub to another timestamp and notice how the available size changes while your relative slider position stays fixed.</li>
+          <li>Choose AUCTION-USD, repeat the order, then compare the number of filled levels and the average price.</li>
+        </ol>
+      </section>
+
+      <section class="faq" aria-labelledby="faq-title">
+        <div class="section-heading">
+          <p class="eyebrow">Reference / 03</p>
+          <h2 id="faq-title">Questions from the ladder</h2>
+        </div>
+        <details>
+          <summary>What is order-book slippage?</summary>
+          <p>It is the extra execution cost created when an order exhausts the best price and fills at worse prices deeper in the book.</p>
+        </details>
+        <details>
+          <summary>Are these real order-book snapshots?</summary>
+          <p>Yes. The bundled BTC-USD and AUCTION-USD L2 snapshots were captured from Coinbase Exchange's public order-book endpoint.</p>
+        </details>
+        <details>
+          <summary>Why does average fill price differ from best price?</summary>
+          <p>The best price may not contain enough size. The matching engine combines every partial fill into one volume-weighted average.</p>
+        </details>
+        <details>
+          <summary>Does Depthwalk place trades?</summary>
+          <p>No. It replays static historical snapshots locally and never connects to an account or submits an order.</p>
+        </details>
+      </section>
+
+      <footer class="site-footer">
+        <span>Built as an inspectable market-microstructure lab.</span>
+        <a href="https://apps.charliekrug.com">More by Charlie Krug</a>
+      </footer>
     </div>
 
     <script type="module" src="./js/main.js"></script>

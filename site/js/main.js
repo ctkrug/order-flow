@@ -208,9 +208,9 @@ async function main() {
     });
 
     const bestPrice = levels[0]?.price;
-    els.statBest.textContent = Number.isFinite(bestPrice) ? formatUsd(bestPrice) : "—";
-    els.statAvg.textContent = fill ? formatUsd(fill.avg_price) : "—";
-    els.statUnfilled.textContent = fill ? formatSize(fill.unfilled_size) : "—";
+    els.statBest.textContent = Number.isFinite(bestPrice) ? formatUsd(bestPrice) : "Not set";
+    els.statAvg.textContent = fill ? formatUsd(fill.avg_price) : "Not set";
+    els.statUnfilled.textContent = fill ? formatSize(fill.unfilled_size) : "Not set";
 
     const slippageCost = fill?.slippage_cost ?? 0;
     animateSlippageTo(slippageCost);

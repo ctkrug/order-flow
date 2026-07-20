@@ -66,10 +66,10 @@ describe("formatSnapshotTime", () => {
   });
 
   it("falls back to an em dash for an invalid timestamp", () => {
-    expect(formatSnapshotTime("not-a-date")).toBe("—");
+    expect(formatSnapshotTime("not-a-date")).toBe("Invalid time");
   });
 
   it("falls back to an em dash for undefined", () => {
-    expect(formatSnapshotTime(undefined)).toBe("—");
+    expect(formatSnapshotTime(undefined)).toBe("Invalid time");
   });
 });

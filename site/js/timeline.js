@@ -22,6 +22,6 @@ export function isAtTimelineEnd(index, length) {
 /** Formats a snapshot's ISO timestamp for the timeline readout, e.g. "14:26:41 UTC". */
 export function formatSnapshotTime(isoString) {
   const parsed = new Date(isoString);
-  if (Number.isNaN(parsed.getTime())) return "—";
+  if (Number.isNaN(parsed.getTime())) return "Invalid time";
   return `${parsed.toISOString().slice(11, 19)} UTC`;
 }
