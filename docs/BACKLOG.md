@@ -1,12 +1,12 @@
 # Backlog
 
-Epics and stories for building Order Flow to v1. All stories start unchecked. The
-first story of Epic 1 is the wow moment — it lands before anything else.
+Epics and stories for building Depthwalk to v1. All stories start unchecked. The
+first story of Epic 1 is the core interaction, which lands before anything else.
 
-## Epic 1 — Core matching engine & the wow moment
+## Epic 1: Core matching engine and the core interaction
 
 - [x] **1.1 [WOW MOMENT] Drag a slider to size a market order and watch it eat the book**
-  - Dragging the size slider updates the highlighted/consumed order-book levels live —
+  - Dragging the size slider updates the highlighted/consumed order-book levels live,
     no page reload, no submit button.
   - A "you just paid $X.XX in slippage" counter is visible and updates continuously as
     the slider moves, computed as `(avg_fill_price - best_price) * filled_size`.
@@ -30,7 +30,7 @@ first story of Epic 1 is the wow moment — it lands before anything else.
     (consumes bids).
   - Switching sides updates the ladder and slippage counter without a full page reload.
 
-## Epic 2 — Historical data & replay
+## Epic 2: Historical data and replay
 
 - [x] **2.1 Bundle real historical order-book snapshot data**
   - At least one real (not synthetic/random) historical L2 snapshot sequence ships as
@@ -50,7 +50,7 @@ first story of Epic 1 is the wow moment — it lands before anything else.
   - Switching scenario resets the timeline position and order size to that scenario's
     defaults.
 
-## Epic 3 — Visual design & feel (per `docs/DESIGN.md`)
+## Epic 3: Visual design and feel (per `docs/DESIGN.md`)
 
 - [x] **3.1 Implement the blueprint/technical visual system**
   - Page uses the color, font (Space Grotesk + JetBrains Mono), spacing, and radius
@@ -60,7 +60,7 @@ first story of Epic 1 is the wow moment — it lands before anything else.
 
 - [x] **3.2 Interaction states & juice**
   - The slider, buttons, and side toggle all have themed hover/focus-visible/active
-    states — no naked native widgets.
+    states, with no naked native widgets.
   - Level-consumed flash and slippage-counter digit-roll animations are implemented
     per the juice plan in `docs/DESIGN.md`.
 
@@ -80,9 +80,9 @@ first story of Epic 1 is the wow moment — it lands before anything else.
   - A full self-review against `docs/DESIGN.md` §D3 (resize/squint/tab-through/play)
     is performed and any gaps found are fixed before this story is checked off.
   - A generated favicon and the designed wordmark (Space Grotesk + blinking cursor)
-    are implemented — no default globe icon.
+    are implemented, with no default globe icon.
 
-## Epic 4 — Ship readiness
+## Epic 4: Ship readiness
 
 - [x] **4.1 Landing framing on the same page**
   - A brief above-the-fold intro (what this is, one-sentence pitch) appears before or
