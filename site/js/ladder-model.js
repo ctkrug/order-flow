@@ -32,7 +32,7 @@ export function buildLadderRows(levels, consumedLevels) {
 }
 
 /**
- * True exactly on the transition from zero to nonzero slippage — the
+ * True exactly on the transition from zero to nonzero slippage, the
  * moment the docs/DESIGN.md juice plan calls the "wow moment" pulse.
  */
 export function crossesWowThreshold(previousSlippageCost, currentSlippageCost) {

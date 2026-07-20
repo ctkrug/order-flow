@@ -1,4 +1,4 @@
-// WebAudio-synthesized SFX per docs/DESIGN.md's juice plan — oscillators
+// WebAudio-synthesized SFX per docs/DESIGN.md's juice plan: oscillators
 // and generated noise only, zero audio file assets. The AudioContext is
 // created lazily on first playback (itself only ever called from inside a
 // user-gesture event handler), and every entry point no-ops quietly in
@@ -75,7 +75,7 @@ export function createAudio(storage = globalThis.localStorage) {
       try {
         storage?.setItem(MUTE_STORAGE_KEY, String(muted));
       } catch {
-        // storage unavailable (private browsing, disabled) — mute state
+        // Storage unavailable (private browsing or disabled); mute state
         // just won't persist across reloads, which is a harmless fallback.
       }
     },
