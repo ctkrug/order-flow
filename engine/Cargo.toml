@@ -2,7 +2,7 @@
 name = "order-flow-engine"
 version = "0.1.0"
 edition = "2021"
-description = "Order-book replay and market-order matching engine, compiled to WASM"
+description = "Depthwalk order-book replay and market-order matching engine"
 license = "MIT"
 
 [lib]

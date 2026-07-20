@@ -1,4 +1,4 @@
-# order-flow-engine
+# Depthwalk matching engine
 
 The matching engine: walks a resting order-book snapshot level by level to fill a
 market order, the same way a real exchange matching engine does. Pure Rust logic with

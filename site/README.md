@@ -1,4 +1,4 @@
-# order-flow-site
+# Depthwalk frontend
 
 The D3 front end: renders the order-book ladder, the size slider, and the slippage
 HUD, and calls into the WASM matching engine (`../engine`) to compute fills. Static,
@@ -10,7 +10,7 @@ subpath.
 ```sh
 npm install
 npm run dev      # local dev server
-npm run build    # outputs dist/ — single self-contained static site
+npm run build    # outputs a self-contained static site in dist/
 ```
 
 Visual direction lives in [`../docs/DESIGN.md`](../docs/DESIGN.md).
