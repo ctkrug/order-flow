@@ -1,7 +1,7 @@
 {
   "scenario": "calm",
   "product": "BTC-USD",
-  "label": "BTC-USD \u2014 deep, liquid book",
+  "label": "BTC-USD: deep, liquid book",
   "source": "Coinbase Exchange public REST API, GET /products/{product}/book?level=2 (no auth required)",
   "source_url": "https://api.exchange.coinbase.com/products/BTC-USD/book?level=2",
   "captured": "2026-07-19T14:28:59+00:00",

@@ -1,7 +1,7 @@
 {
   "scenario": "thin",
   "product": "AUCTION-USD",
-  "label": "AUCTION-USD \u2014 thin, low-liquidity book",
+  "label": "AUCTION-USD: thin, low-liquidity book",
   "source": "Coinbase Exchange public REST API, GET /products/{product}/book?level=2 (no auth required)",
   "source_url": "https://api.exchange.coinbase.com/products/AUCTION-USD/book?level=2",
   "captured": "2026-07-19T14:28:59+00:00",
