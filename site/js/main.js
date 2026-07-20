@@ -153,6 +153,7 @@ async function main() {
     snapshotIndex = clampTimelineIndex(index, snapshots().length);
     els.timelineSlider.value = String(snapshotIndex);
     updateTimelineReadout();
+    configureSlider();
     if (crossfade) {
       els.ladder.classList.add("scrub-dim");
       requestAnimationFrame(() => requestAnimationFrame(() => els.ladder.classList.remove("scrub-dim")));
