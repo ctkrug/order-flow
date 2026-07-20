@@ -2,7 +2,12 @@ import { loadEngine } from "./engine.js";
 import { createLadderView } from "./book-view.js";
 import { crossesWowThreshold } from "./ladder-model.js";
 import { formatSize, formatUsd } from "./format.js";
-import { clampTimelineIndex, formatSnapshotTime } from "./timeline.js";
+import {
+  clampTimelineIndex,
+  formatSnapshotTime,
+  isAtTimelineEnd,
+  stepTimelineIndex,
+} from "./timeline.js";
 import { createAudio } from "./audio.js";
 import { tweenValue } from "./tween.js";
 
@@ -176,12 +181,11 @@ async function main() {
     }
     els.timelinePlay.setAttribute("aria-pressed", "true");
     playTimer = setInterval(() => {
-      const next = snapshotIndex + 1;
-      if (next >= snapshots().length) {
+      if (isAtTimelineEnd(snapshotIndex, snapshots().length)) {
         stopPlayback();
         return;
       }
-      goToSnapshot(next);
+      goToSnapshot(stepTimelineIndex(snapshotIndex, 1, snapshots().length));
     }, PLAY_INTERVAL_MS);
   }
 
