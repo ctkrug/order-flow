@@ -81,3 +81,27 @@ test("stays stable through rapid replay updates", async ({ page }) => {
   expect(await page.locator(".ladder-row").count()).toBeGreaterThan(0);
   expect(pageErrors).toEqual([]);
 });
+
+test("rescales order size when replay depth changes", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".ladder-row")).not.toHaveCount(0);
+
+  const orderSize = page.locator("#size-slider");
+  const initialMax = await orderSize.evaluate((input) => Number(input.max));
+  await orderSize.evaluate((input) => {
+    input.value = String(Number(input.max) / 2);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
+  await page.locator("#timeline-slider").evaluate((input) => {
+    input.value = "2";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
+  const resized = await orderSize.evaluate((input) => ({
+    max: Number(input.max),
+    value: Number(input.value),
+  }));
+  expect(resized.max).not.toBe(initialMax);
+  expect(resized.value / resized.max).toBeCloseTo(0.5, 2);
+});
